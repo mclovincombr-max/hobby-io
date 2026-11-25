@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>hobby.io | Xadrez</title>
+  <meta name="description" content="hobby.io: um site sobre o meu hobby, o xadrez. Tem tabuleiro interativo, desafios de mate e um lugar para jogar com um amigo.">
+  <meta property="og:title" content="hobby.io | Xadrez">
+  <meta property="og:description" content="Meu hobby favorito: xadrez. Tabuleiro interativo, desafios de mate, jogo com amigo, meus ídolos e curiosidades.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#1a1330">
+  <link rel="icon" href="images/cavalo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600;1,700&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Aplica o tema salvo ANTES de a página aparecer (evita piscar a cor errada) -->
+  <script>
+    document.documentElement.classList.add("js");
+    try {
+      var tema = localStorage.getItem("xadrez-tema");
+      if (tema) document.documentElement.setAttribute("data-tema", tema);
+    } catch (erro) {}
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="topo">
+    <a class="logo" href="#inicio" aria-label="hobby.io, voltar ao início"><span class="logo-cavalo" aria-hidden="true">♞</span>hobby<em>.io</em></a>
+
+    <!-- Escolha da cor do site -->
+    <div class="temas" id="temas" role="group" aria-label="Escolher a cor do site">
+      <button type="button" class="tema-bolinha" data-tema="roxo" aria-label="Tema roxo" title="Roxo"></button>
+      <button type="button" class="tema-bolinha" data-tema="verde" aria-label="Tema verde" title="Verde"></button>
+      <button type="button" class="tema-bolinha" data-tema="azul" aria-label="Tema azul" title="Azul"></button>
+      <button type="button" class="tema-bolinha" data-tema="vinho" aria-label="Tema vinho" title="Vinho"></button>
+      <button type="button" class="tema-bolinha" data-tema="classico" aria-label="Tema clássico (o primeiro)" title="Clássico"></button>
+    </div>
+
+    <button class="menu-botao" id="menuBotao" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu">☰</button>
+    <nav id="menu" class="menu">
+      <a href="#inicio">Início</a>
+      <a href="#pecas">As peças</a>
+      <a href="#jogar">Jogar</a>
+      <a href="#desafios">Desafios</a>
+      <a href="#aberturas">Aberturas</a>
+      <a href="#idolos">Ídolos</a>
+      <a href="#dicas">Dicas</a>
+      <a href="#sobre">Sobre mim</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- HERO: tabuleiro interativo -->
+    <section id="inicio" class="hero">
+      <div class="flutuantes" aria-hidden="true"><span>♛</span><span>✦</span><span>♝</span><span>✦</span><span>♜</span><span>✦</span></div>
+      <div class="hero-texto">
+        <p class="etiqueta">Meu hobby favorito</p>
+        <h1>Trinta e duas peças, <em>uma ideia por vez.</em></h1>
+        <p>Jogo xadrez porque cada partida é um problema novo para resolver. Toque numa peça do tabuleiro ao lado e veja como ela se move.</p>
+        <p class="dica" id="infoPeca" aria-live="polite">Nenhuma peça selecionada.</p>
+        <div class="acoes">
+          <a class="botao" href="#jogar">♞ Jogar com um amigo</a>
+          <a class="botao secundario" href="#desafios">Resolver um mate</a>
+        </div>
+        <ul class="numeros" aria-label="Números do xadrez">
+          <li><strong>64</strong> casas</li>
+          <li><strong>32</strong> peças</li>
+          <li><strong>6</strong> tipos de peça</li>
+        </ul>
+      </div>
+      <div class="tabuleiro" id="tabuleiro" aria-label="Tabuleiro de xadrez"></div>
+    </section>
+
+    <!-- AS PEÇAS -->
+    <section id="pecas" class="secao">
+      <h2>As peças e seus movimentos</h2>
+      <div class="grade">
+        <article class="carta"><span class="simbolo">♚</span><h3>Rei</h3><span class="valor">vale: o jogo todo</span><p>Anda uma casa em qualquer direção. Se ele cai, o jogo acaba.</p></article>
+        <article class="carta"><span class="simbolo">♛</span><h3>Dama</h3><span class="valor">vale 9 pontos</span><p>A peça mais forte: anda quantas casas quiser em linha reta ou na diagonal.</p></article>
+        <article class="carta"><span class="simbolo">♜</span><h3>Torre</h3><span class="valor">vale 5 pontos</span><p>Anda em linha reta, na horizontal ou na vertical.</p></article>
+        <article class="carta"><span class="simbolo">♝</span><h3>Bispo</h3><span class="valor">vale 3 pontos</span><p>Anda na diagonal e fica sempre na mesma cor de casa.</p></article>
+        <article class="carta"><span class="simbolo">♞</span><h3>Cavalo</h3><span class="valor">vale 3 pontos</span><p>Anda em "L" e é a única peça que pula as outras.</p></article>
+        <article class="carta"><span class="simbolo">♟&#xFE0E;</span><h3>Peão</h3><span class="valor">vale 1 ponto</span><p>Anda para frente, captura na diagonal e pode virar qualquer peça ao chegar ao fim do tabuleiro.</p></article>
+      </div>
+
+      <h3 class="subtitulo">Jogadas especiais</h3>
+      <div class="grade">
+        <article class="carta especial"><h3>Roque</h3><p>O rei anda duas casas em direção a uma torre, e a torre pula para o outro lado dele. Só vale se nenhum dos dois se mexeu antes e o rei não passa por casas atacadas.</p></article>
+        <article class="carta especial"><h3>En passant</h3><p>Se um peão avança duas casas e para ao lado de um peão inimigo, esse inimigo pode capturá-lo "de passagem" — mas só no lance seguinte.</p></article>
+        <article class="carta especial"><h3>Promoção</h3><p>Peão que chega à última linha troca de peça na hora: dama, torre, bispo ou cavalo. Quase todo mundo escolhe a dama.</p></article>
+        <article class="carta especial"><h3>Xeque e xeque-mate</h3><p>Xeque é quando o rei está sendo atacado. Xeque-mate é quando ele não tem como escapar: fim de jogo.</p></article>
+        <article class="carta especial"><h3>Afogamento</h3><p>Se o jogador da vez não tem nenhum lance legal e o rei <em>não</em> está em xeque, a partida termina empatada.</p></article>
+        <article class="carta especial"><h3>Outros empates</h3><p>Mesma posição três vezes, 50 lances sem captura nem movimento de peão, ou falta de peças para dar mate.</p></article>
+      </div>
+    </section>
+
+    <!-- JOGAR COM UM AMIGO -->
+    <section id="jogar" class="secao">
+      <h2>Jogue com um amigo</h2>
+      <p class="intro">Um tabuleiro, dois jogadores, o mesmo aparelho. Quando eu e meu amigo estamos juntos, a gente joga por aqui e passa o celular (ou o computador) de mão em mão. O site já confere as regras, avisa o xeque e guarda o placar.</p>
+
+      <div class="jogo">
+        <div class="jogo-tabuleiro">
+          <p class="status" id="statusJogo" role="status" aria-live="polite">Vez das brancas.</p>
+
+          <div class="jogador" id="jogadorTopo">
+            <span class="jn"><span class="ficha"></span><strong class="jnome"></strong><span class="jv"></span></span>
+            <span class="jc" aria-label="Peças capturadas"></span>
+            <span class="jr"></span>
+          </div>
+
+          <div class="tabuleiro tabuleiro-jogo" id="tabuleiroJogo" aria-label="Tabuleiro da partida"></div>
+
+          <div class="jogador" id="jogadorBase">
+            <span class="jn"><span class="ficha"></span><strong class="jnome"></strong><span class="jv"></span></span>
+            <span class="jc" aria-label="Peças capturadas"></span>
+            <span class="jr"></span>
+          </div>
+        </div>
+
+        <aside class="jogo-painel">
+          <fieldset class="nomes">
+            <legend>Jogadores e placar</legend>
+            <label class="linha-nome">
+              <span class="cor-tag" id="tag0"></span>
+              <input type="text" id="nome0" maxlength="14" value="Jogador 1" aria-label="Nome do jogador 1" autocomplete="off">
+              <output class="pontos" id="pontos0">0</output>
+            </label>
+            <label class="linha-nome">
+              <span class="cor-tag" id="tag1"></span>
+              <input type="text" id="nome1" maxlength="14" value="Jogador 2" aria-label="Nome do jogador 2" autocomplete="off">
+              <output class="pontos" id="pontos1">0</output>
+            </label>
+            <p class="empates">Empates: <strong id="pontosEmpate">0</strong>
+              <button type="button" class="link-botao" id="zerarPlacar">zerar placar</button></p>
+          </fieldset>
+
+          <div class="opcoes">
+            <label>Relógio
+              <select id="relogio">
+                <option value="0">Sem relógio</option>
+                <option value="3">3 minutos</option>
+                <option value="5">5 minutos</option>
+                <option value="10">10 minutos</option>
+                <option value="15">15 minutos</option>
+              </select>
+            </label>
+            <label class="marcar"><input type="checkbox" id="girarAuto"> Girar o tabuleiro a cada jogada</label>
+            <label class="marcar"><input type="checkbox" id="alternar" checked> Trocar as cores a cada partida</label>
+          </div>
+
+          <div class="botoes-jogo">
+            <button type="button" class="botao" id="novaPartida">Nova partida</button>
+            <button type="button" class="botao secundario" id="desfazer">↶ Desfazer</button>
+            <button type="button" class="botao secundario" id="girar">⇅ Girar</button>
+            <button type="button" class="botao secundario" id="trocarCores">⇄ Trocar cores</button>
+            <button type="button" class="botao secundario" id="empatar">½ Empate</button>
+            <button type="button" class="botao secundario" id="desistir">⚑ Desistir</button>
+          </div>
+
+          <h3 class="mini">Lances</h3>
+          <ol class="lances" id="listaLances" aria-label="Lista de lances"></ol>
+        </aside>
+      </div>
+    </section>
+
+    <!-- DESAFIOS -->
+    <section id="desafios" class="secao">
+      <h2>Desafios: mate em 1</h2>
+      <p class="intro">Você joga de brancas e tem <strong>um único lance</strong> para dar xeque-mate. Toque na peça e depois na casa de destino. Qualquer xeque-mate vale!</p>
+
+      <div class="desafio">
+        <div class="desafio-escolha" id="desafioEscolha" role="group" aria-label="Escolher o desafio"></div>
+        <div class="desafio-info">
+          <h3 id="desafioTitulo"></h3>
+          <p class="status" id="desafioStatus" role="status" aria-live="polite"></p>
+          <div class="botoes-jogo">
+            <button type="button" class="botao secundario" id="desafioDica">💡 Dica</button>
+            <button type="button" class="botao secundario" id="desafioSolucao">Ver solução</button>
+            <button type="button" class="botao secundario" id="desafioReiniciar">↺ Recomeçar</button>
+          </div>
+          <p class="progresso" id="desafioProgresso"></p>
+        </div>
+        <div class="tabuleiro tabuleiro-desafio" id="tabuleiroDesafio" aria-label="Tabuleiro do desafio"></div>
+      </div>
+    </section>
+
+    <!-- ABERTURAS -->
+    <section id="aberturas" class="secao">
+      <h2>Aberturas que eu conheço</h2>
+      <p class="intro">Abra uma abertura e aperte <strong>▶</strong> para ver as jogadas acontecendo no tabuleiro, com a explicação de cada lance. Você também pode voltar, avançar ou tocar nos lances da lista.</p>
+      <details data-abertura="italiana">
+        <summary>Abertura Italiana</summary>
+        <p><strong>1.e4 e5 2.Cf3 Cc6 3.Bc4.</strong> As brancas desenvolvem rápido e miram o ponto fraco f7. Boa para quem está começando.</p>
+      </details>
+      <details data-abertura="siciliana">
+        <summary>Defesa Siciliana</summary>
+        <p><strong>1.e4 c5.</strong> As pretas jogam por uma posição desequilibrada e lutam pela vitória desde o começo.</p>
+      </details>
+      <details data-abertura="gambito">
+        <summary>Gambito da Dama</summary>
+        <p><strong>1.d4 d5 2.c4.</strong> As brancas oferecem um peão para ganhar controle do centro.</p>
+      </details>
+      <details data-abertura="espanhola">
+        <summary>Abertura Espanhola (Ruy Lopez)</summary>
+        <p><strong>1.e4 e5 2.Cf3 Cc6 3.Bb5.</strong> O bispo pressiona o cavalo que defende o peão de e5. É uma das aberturas mais estudadas da história.</p>
+      </details>
+      <details data-abertura="francesa">
+        <summary>Defesa Francesa</summary>
+        <p><strong>1.e4 e6 2.d4 d5.</strong> As pretas montam uma posição sólida, com os peões bem protegidos, e esperam o momento certo para contra-atacar.</p>
+      </details>
+      <details data-abertura="carokann">
+        <summary>Defesa Caro-Kann</summary>
+        <p><strong>1.e4 c6 2.d4 d5.</strong> Parecida com a Francesa, mas deixa o bispo de casas claras livre. Muito confiável.</p>
+      </details>
+
+      <h3 class="subtitulo">Armadilhas para ficar de olho</h3>
+      <div class="grade duas">
+        <article class="carta" data-abertura="pastor"><h3>Mate do Pastor</h3><p class="notacao">1.e4 e5 2.Dh5 Cc6 3.Bc4 Cf6?? 4.Dxf7#</p><p>Mate em 4 lances mirando f7. Quem conhece essa armadilha nunca mais cai nela. Dá para treinar no desafio 2 lá em cima!</p></article>
+        <article class="carta" data-abertura="louco"><h3>Mate do Louco</h3><p class="notacao">1.f3 e5 2.g4 Dh4#</p><p>O mate mais rápido possível: só 2 lances. Acontece quando as brancas abrem o rei sem querer.</p></article>
+      </div>
+    </section>
+
+    <!-- ÍDOLOS E CAMPEONATOS -->
+    <section id="idolos" class="secao">
+      <h2>Meus ídolos do xadrez</h2>
+      <p class="intro">Três campeões que me fizeram gostar ainda mais do jogo. Cada um joga de um jeito diferente, e é isso que torna o xadrez tão interessante.</p>
+
+      <div class="grade">
+        <article class="carta idolo">
+          <div class="foto">
+            <img src="images/tal.jpg" alt="Foto de Mikhail Tal" onerror="this.remove()">
+            <span class="foto-aviso">Coloque a foto em <code>images/tal.jpg</code></span>
+          </div>
+          <h3>Mikhail Tal</h3>
+          <span class="valor">Letônia · 1936–1992</span>
+          <p>O "Mago de Riga". Foi campeão mundial em 1960, aos 23 anos, e ficou famoso por sacrifícios ousados que deixavam o adversário sem saber o que fazer.</p>
+          <p class="porque"><strong>Por que eu gosto:</strong> ele jogava para criar confusão e surpreender.</p>
+        </article>
+        <article class="carta idolo">
+          <div class="foto">
+            <img src="images/kasparov.jpg" alt="Foto de Garry Kasparov" onerror="this.remove()">
+            <span class="foto-aviso">Coloque a foto em <code>images/kasparov.jpg</code></span>
+          </div>
+          <h3>Garry Kasparov</h3>
+          <span class="valor">Azerbaijão · nascido em 1963</span>
+          <p>Campeão mundial de 1985 a 2000, um dos maiores de todos os tempos. Em 1997 enfrentou o computador Deep Blue numa partida que entrou para a história.</p>
+          <p class="porque"><strong>Por que eu gosto:</strong> a energia e o quanto ele estudava as aberturas.</p>
+        </article>
+        <article class="carta idolo">
+          <div class="foto">
+            <img src="images/fischer.jpg" alt="Foto de Bobby Fischer" onerror="this.remove()">
+            <span class="foto-aviso">Coloque a foto em <code>images/fischer.jpg</code></span>
+          </div>
+          <h3>Bobby Fischer</h3>
+          <span class="valor">Estados Unidos · 1943–2008</span>
+          <p>Aos 13 anos jogou a "Partida do Século" e, em 1972, venceu o soviético Boris Spassky no Mundial disputado em Reykjavik, na Islândia.</p>
+          <p class="porque"><strong>Por que eu gosto:</strong> a disciplina e a busca pelo lance perfeito.</p>
+        </article>
+      </div>
+
+      <h3 class="subtitulo">Campeonatos que eu gosto de acompanhar</h3>
+      <div class="grade duas">
+        <article class="carta"><span class="simbolo">🏆</span><h3>Mundial de Xadrez</h3><p>A disputa pelo título mais importante: o campeão defende a coroa contra o desafiante. Cada lance é analisado no mundo todo.</p></article>
+        <article class="carta"><span class="simbolo">🎯</span><h3>Torneio de Candidatos</h3><p>Os melhores jogadores do planeta lutam para decidir quem enfrenta o campeão mundial.</p></article>
+        <article class="carta"><span class="simbolo">🌐</span><h3>Olimpíada de Xadrez</h3><p>Seleções de vários países jogam em equipe, a cada dois anos. É bonito ver o xadrez como esporte coletivo.</p></article>
+        <article class="carta"><span class="simbolo">⚡</span><h3>Blitz e xadrez rápido</h3><p>Partidas de poucos minutos, cheias de erros e reviravoltas. É o ritmo que eu mais gosto de assistir e de jogar.</p></article>
+      </div>
+      <div class="foto larga">
+            <img src="images/torneio.jpg" alt="Foto de um campeonato de xadrez" onerror="this.remove()">
+            <span class="foto-aviso">Coloque a foto em <code>images/torneio.jpg</code></span>
+          </div>
+    </section>
+
+    <!-- DICAS E CURIOSIDADES -->
+    <section id="dicas" class="secao">
+      <h2>Dicas e curiosidades</h2>
+      <div class="duas-colunas">
+        <div>
+          <h3 class="subtitulo primeiro">5 dicas para quem está começando</h3>
+          <ol class="dicas-lista">
+            <li><strong>Controle o centro.</strong> Peões e peças nas casas e4, d4, e5 e d5 ganham espaço.</li>
+            <li><strong>Desenvolva as peças.</strong> Tire cavalos e bispos de casa antes de sair com a dama.</li>
+            <li><strong>Faça o roque cedo.</strong> O rei fica mais seguro e a torre entra no jogo.</li>
+            <li><strong>Não repita a mesma peça</strong> na abertura sem um bom motivo.</li>
+            <li><strong>Antes de jogar, olhe a resposta do adversário.</strong> "O que ele ameaça agora?" evita muito erro bobo.</li>
+          </ol>
+        </div>
+        <div>
+          <h3 class="subtitulo primeiro">As três fases da partida</h3>
+          <div class="fases">
+            <article class="carta"><h3>Abertura</h3><p>Tirar as peças de casa e lutar pelo centro.</p></article>
+            <article class="carta"><h3>Meio-jogo</h3><p>Fazer planos, atacar e trocar peças.</p></article>
+            <article class="carta"><h3>Final</h3><p>Poucas peças: o rei vira peça de ataque e os peões viram dama.</p></article>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subtitulo">Você sabia?</h3>
+      <div class="grade">
+        <article class="carta curiosidade"><span class="simbolo">🌍</span><p>O xadrez nasceu na Índia há mais de 1.500 anos, num jogo chamado <em>chaturanga</em>.</p></article>
+        <article class="carta curiosidade"><span class="simbolo">🤖</span><p>Em 1997, o computador Deep Blue venceu o campeão mundial Garry Kasparov numa partida oficial.</p></article>
+        <article class="carta curiosidade"><span class="simbolo">♾️</span><p>Existem mais partidas possíveis de xadrez do que átomos no universo observável. Sem exagero!</p></article>
+        <article class="carta curiosidade"><span class="simbolo">🔤</span><p>As colunas são letras (a–h) e as linhas são números (1–8). Por isso "e4" é sempre a mesma casa, em qualquer lugar do mundo.</p></article>
+        <article class="carta curiosidade"><span class="simbolo">⏱️</span><p>No xadrez relâmpago (blitz) cada jogador tem poucos minutos para a partida inteira. Dá para testar no relógio da seção Jogar.</p></article>
+        <article class="carta curiosidade"><span class="simbolo">👑</span><p>A dama já foi uma peça fraca, que andava só uma casa na diagonal. Hoje ela é a mais poderosa do tabuleiro.</p></article>
+        <article class="carta curiosidade"><span class="simbolo">👸</span><p>Em teoria, um jogador pode ter até 9 damas ao mesmo tempo: a original e mais 8 peões promovidos.</p></article>
+        <article class="carta curiosidade"><span class="simbolo">⚪</span><p>As brancas sempre começam, e por isso têm uma pequena vantagem estatística.</p></article>
+        <article class="carta curiosidade"><span class="simbolo">🇧🇷</span><p>O brasileiro Henrique Mecking, o Mequinho, foi o primeiro grande mestre do Brasil, em 1972.</p></article>
+      </div>
+    </section>
+
+    <!-- SOBRE MIM -->
+    <section id="sobre" class="secao">
+      <div class="sobre">
+        <div class="avatar">
+          <span class="avatar-glifo" aria-hidden="true">♞</span>
+          <img src="images/nathan.jpg" alt="Foto do Nathan" onerror="this.remove()">
+        </div>
+        <div>
+          <h2>Sobre mim</h2>
+          <p>Oi, eu sou o Nathan! Sou estudante de computação e o xadrez é o meu hobby favorito. Gosto dele porque lembra programação: dá para quebrar um problema grande em pequenas decisões e testar ideias antes de agir.</p>
+          <p>Jogo online e com amigos, gosto de resolver mates e estou sempre aprendendo aberturas novas. Este site reúne tudo o que eu curto no jogo.</p>
+        </div>
+      </div>
+
+      <h3 class="subtitulo">Minha ficha de jogador</h3>
+      <dl class="perfil-dados">
+        <div><dt>Peça favorita</dt><dd>♞ Cavalo</dd></div>
+        <div><dt>Abertura favorita</dt><dd>Abertura Italiana</dd></div>
+        <div><dt>Ritmo preferido</dt><dd>Rápido (10 minutos)</dd></div>
+        <div><dt>Meu rating</dt><dd>900</dd></div>
+      </dl>
+
+      <h3 class="subtitulo">Minha jornada</h3>
+      <ol class="jornada">
+        <li><strong>O começo.</strong> Aprendi como cada peça se move e joguei as primeiras partidas.</li>
+        <li><strong>Os primeiros mates.</strong> Conheci o Mate do Pastor do jeito mais difícil: caindo nele.</li>
+        <li><strong>As aberturas.</strong> Comecei a estudar a Italiana e a Defesa Siciliana.</li>
+        <li><strong>Hoje.</strong> Jogo online e com amigos, e criei este site para juntar tudo.</li>
+      </ol>
+    </section>
+  </main>
+
+  <!-- Navegação numerada no final da tela -->
+  <nav class="dock" id="dock" aria-label="Ir para uma seção">
+    <a href="#inicio" data-alvo="inicio" aria-label="1: Início" title="Início">1</a>
+    <a href="#pecas" data-alvo="pecas" aria-label="2: As peças" title="As peças">2</a>
+    <a href="#jogar" data-alvo="jogar" aria-label="3: Jogar" title="Jogar">3</a>
+    <a href="#desafios" data-alvo="desafios" aria-label="4: Desafios" title="Desafios">4</a>
+    <a href="#aberturas" data-alvo="aberturas" aria-label="5: Aberturas" title="Aberturas">5</a>
+    <a href="#idolos" data-alvo="idolos" aria-label="6: Ídolos" title="Ídolos">6</a>
+    <a href="#dicas" data-alvo="dicas" aria-label="7: Dicas" title="Dicas">7</a>
+    <a href="#sobre" data-alvo="sobre" aria-label="8: Sobre" title="Sobre">8</a>
+  </nav>
+
+  <footer class="rodape">
+    <p class="rodape-logo">♞ hobby<em>.io</em></p>
+    <p>Feito por Nathan © <span id="ano"></span> · Projeto Final A1</p>
+  </footer>
+
+  <!-- Caixa de perguntas (promoção, desistir, etc.) -->
+  <dialog id="caixa" aria-labelledby="caixaTitulo">
+    <h3 id="caixaTitulo"></h3>
+    <p id="caixaTexto"></p>
+    <div class="caixa-botoes" id="caixaBotoes"></div>
+  </dialog>
+
+  <script src="js/motor.js"></script>
+  <script src="js/tabuleiro.js"></script>
+  <script src="js/script.js"></script>
+  <script src="js/aberturas.js"></script>
+  <script src="js/jogo.js"></script>
+  <script src="js/desafios.js"></script>
+</body>
+</html>
